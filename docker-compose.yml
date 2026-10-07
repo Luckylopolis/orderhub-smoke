@@ -1,0 +1,60 @@
+# Modo desarrollo (recomendado):   docker compose up -d           -> solo RabbitMQ
+# Todo en contenedores:            docker compose --profile full up --build
+services:
+  rabbitmq:
+    image: rabbitmq:4-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    profiles: ["full"]
+    build:
+      context: .
+      dockerfile: src/OrderHub.Api/Dockerfile
+    environment:
+      ConnectionStrings__Default: "Data Source=/data/orderhub.db"
+      RabbitMq__Host: rabbitmq
+      ASPNETCORE_URLS: "http://+:8080"
+    ports:
+      - "5080:8080"
+    volumes:
+      - orderhub-data:/data
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  worker:
+    profiles: ["full"]
+    build:
+      context: .
+      dockerfile: src/OrderHub.Worker/Dockerfile
+    environment:
+      ConnectionStrings__Default: "Data Source=/data/orderhub.db"
+      RabbitMq__Host: rabbitmq
+    volumes:
+      - orderhub-data:/data
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      api:
+        condition: service_started
+
+  web:
+    profiles: ["full"]
+    build:
+      context: web
+      args:
+        VITE_API_URL: http://localhost:5080
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+
+volumes:
+  orderhub-data:
