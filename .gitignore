@@ -3,7 +3,7 @@ obj/
 .vs/
 .idea/
 *.user
-data/
+/data/
 *.db
 *.db-shm
 *.db-wal
