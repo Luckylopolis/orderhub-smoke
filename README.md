@@ -45,6 +45,11 @@ npm run dev
 
 # 5. Tests (en otra terminal, desde la raíz del repo)
 dotnet test
+
+# 6. Herramienta de migraciones de EF Core (desde la raíz del repo)
+dotnet tool restore
+dotnet ef --version
+#    → debe mostrar "Entity Framework Core .NET Command-line Tools" y la versión 8.0.31
 ```
 
 **Opcional:** verifica que también puedes levantar todo en contenedores. Así quedan descargadas las imágenes base. Antes, detén los procesos de los pasos 2 a 4 (Ctrl+C), porque usan los mismos puertos.
@@ -59,7 +64,7 @@ docker compose --profile full up --build
 docker compose --profile full down
 ```
 
-Cuando termines, **responde el correo con una captura de la pantalla del paso 4**, o con el error que encontraste. Te ayudamos a resolverlo antes de la sesión.
+Cuando termines, **responde el correo con una captura de la pantalla del paso 4 y de la salida del paso 6**, o con el error que encontraste. Te ayudamos a resolverlo antes de la sesión.
 
 ## Durante la sesión
 
@@ -77,3 +82,4 @@ Cuando termines, **responde el correo con una captura de la pantalla del paso 4*
 | La API no conecta con RabbitMQ | Revisa que el contenedor esté `healthy`: `docker compose ps` |
 | `npm ci` falla | Verifica tu versión de Node (`node -v` ≥ 20) |
 | `dotnet run` dice que falta el framework 8.0 | Instala el runtime de .NET 8 aunque tengas un SDK más nuevo |
+| `dotnet ef` no se reconoce como comando | Ejecuta antes `dotnet tool restore` desde la raíz del repo |
